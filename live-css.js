@@ -165,10 +165,10 @@
     // If not enabled, bail early
     if (!shouldEnable(cfg)) return;
 
-    const LS_KEY = cfg.storageKey;
-    const LS_POS = cfg.storagePosKey;
-    const LS_SIZE = cfg.storageSizeKey;
-    const LS_OPEN = cfg.storageOpenKey;
+    const LS_KEY  = cfg.storageKey;
+    const LS_POS  = cfg.storagePosKey  || (LS_KEY + "__pos");
+    const LS_SIZE = cfg.storageSizeKey || (LS_KEY + "__size");
+    const LS_OPEN = cfg.storageOpenKey || (LS_KEY + "__open");
 
     // Inject live style tag (override layer)
     const styleTag = document.createElement("style");
@@ -203,7 +203,7 @@
     overlayCss.textContent = `
       #atlas-live-css{
         position:fixed;
-        inset:auto 14px 14px auto;
+        inset:auto ${cfg.offsetRight}px ${cfg.offsetBottom}px auto;
         z-index:2147483647;
         font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
         -webkit-font-smoothing: antialiased;
