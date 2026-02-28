@@ -28,8 +28,8 @@
     maxHeightPct: 0.75,
     offsetRight: 28,
     offsetBottom: 14,
-    panelWidth: 320,
-    panelHeight: 280,
+    panelWidth: 220,
+    panelHeight: 180,
 
     // Helpers
     threeFingerOpen: true,
