@@ -5,6 +5,101 @@
  *   <script src="https://cdn.jsdelivr.net/gh/AWildBeef/atlas-live-css@v1.0.0/live-css.js"></script>
  *   <script>AtlasLiveCSS.init({ queryParam: "livecss", enabledOnParam: true });</script>
  */
+ 
+ (function () {
+  function isSameOrigin(sheet) {
+    try {
+      // accessing cssRules will throw on cross-origin stylesheets
+      void sheet.cssRules;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function declText(style) {
+    // style is CSSStyleDeclaration
+    const out = [];
+    for (let i = 0; i < style.length; i++) {
+      const prop = style[i];
+      const val = style.getPropertyValue(prop);
+      const prio = style.getPropertyPriority(prop);
+      out.push(`  ${prop}: ${val}${prio ? " !important" : ""};`);
+    }
+    return out.join("\n");
+  }
+
+  function safeMatches(el, selector) {
+    // Skip pseudo-elements which always throw
+    if (selector.includes("::")) return false;
+
+    // Some selectors can throw (unknown pseudo-class etc). Just ignore them.
+    try {
+      return el.matches(selector);
+    } catch {
+      return false;
+    }
+  }
+
+  function ruleMatchesEl(rule, el) {
+    const sel = rule.selectorText;
+    if (!sel) return false;
+
+    // selectorText can be "a, b, c" – test each part
+    const parts = sel.split(",").map(s => s.trim()).filter(Boolean);
+    return parts.some(s => safeMatches(el, s));
+  }
+
+  async function copyMatchedRules(el, opts = {}) {
+    const {
+      include = [/style\.css(\?|$)/i],  // regex list to include sheets by href (default: style.css)
+      exclude = [],                    // regex list to exclude
+      includeInline = true,            // also include <style> blocks (href == null)
+      maxRules = 200,                  // safety cap
+    } = opts;
+
+    if (!el) throw new Error("copyMatchedRules(el): element is required");
+
+    const chunks = [];
+    let count = 0;
+
+    for (const sheet of Array.from(document.styleSheets)) {
+      if (!isSameOrigin(sheet)) continue;
+
+      const href = sheet.href || "";
+      const isInline = !sheet.href;
+
+      if (!includeInline && isInline) continue;
+
+      if (!isInline) {
+        if (exclude.some(r => r.test(href))) continue;
+        if (include.length && !include.some(r => r.test(href))) continue;
+      }
+
+      for (const rule of Array.from(sheet.cssRules)) {
+        if (count >= maxRules) break;
+
+        // Only normal style rules (ignore @media for now; see note below)
+        if (rule.type !== CSSRule.STYLE_RULE) continue;
+
+        if (ruleMatchesEl(rule, el)) {
+          const body = declText(rule.style);
+          if (body.trim()) {
+            chunks.push(`${rule.selectorText} {\n${body}\n}`);
+            count++;
+          }
+        }
+      }
+    }
+
+    const out = chunks.join("\n\n") || "/* No matching STYLE_RULE rules found (or sheet not accessible). */";
+    await navigator.clipboard.writeText(out);
+    return out;
+  }
+
+  // Expose globally (nice for Eruda console)
+  window.copyMatchedRules = copyMatchedRules;
+})();
 
 (function () {
   const DEFAULTS = {
