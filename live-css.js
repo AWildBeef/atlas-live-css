@@ -293,16 +293,20 @@
       }
 
       if (act === "reset-ui") {
-        // position + size + open state reset
-        localStorage.removeItem(LS_POS);
-        localStorage.removeItem(LS_SIZE);
-        localStorage.removeItem(LS_OPEN);
-        wrap.style.right  = cfg.offsetRight + "px";
-        wrap.style.bottom = cfg.offsetBottom + "px";
-        panel.style.width = "";
-        panel.style.height = "";
-        wrap.classList.remove("is-open");
-      }
+      localStorage.removeItem(LS_POS);
+      localStorage.removeItem(LS_SIZE);
+      localStorage.removeItem(LS_OPEN);
+
+      wrap.style.right  = cfg.offsetRight + "px";
+      wrap.style.bottom = cfg.offsetBottom + "px";
+      wrap.style.left = "auto";
+      wrap.style.top  = "auto";
+
+      panel.style.width  = cfg.panelWidth + "px";
+      panel.style.height = cfg.panelHeight + "px";
+
+      wrap.classList.remove("is-open");
+    }
 
       if (act === "copy") {
         try {
@@ -419,23 +423,21 @@
         styleTag.textContent = "";
         localStorage.removeItem(LS_KEY);
       },
-      if (act === "reset-ui") {
+      resetUI: () => {
       localStorage.removeItem(LS_POS);
       localStorage.removeItem(LS_SIZE);
       localStorage.removeItem(LS_OPEN);
 
-      // position defaults
       wrap.style.right  = cfg.offsetRight + "px";
       wrap.style.bottom = cfg.offsetBottom + "px";
       wrap.style.left = "auto";
-      wrap.style.top = "auto";
+      wrap.style.top  = "auto";
 
-      // size defaults
       panel.style.width  = cfg.panelWidth + "px";
       panel.style.height = cfg.panelHeight + "px";
 
       wrap.classList.remove("is-open");
-    }
+    },
       getCSS: () => ta.value,
       setCSS: (css) => {
         ta.value = css || "";
