@@ -122,6 +122,8 @@
     minHeight: 180,
     maxWidthPct: 0.95,
     maxHeightPct: 0.75,
+    offsetRight: 14,
+    offsetBottom: 14,
 
     // Helpers
     threeFingerOpen: true,
@@ -335,6 +337,11 @@
         wrap.style.top = "auto";
       } catch {}
     })();
+    // If no saved pos, apply configured default offsets
+    if (!localStorage.getItem(LS_POS)) {
+      wrap.style.right  = cfg.offsetRight + "px";
+      wrap.style.bottom = cfg.offsetBottom + "px";
+    }
 
     (function applySize() {
       const raw = localStorage.getItem(LS_SIZE);
@@ -380,8 +387,8 @@
         localStorage.removeItem(LS_POS);
         localStorage.removeItem(LS_SIZE);
         localStorage.removeItem(LS_OPEN);
-        wrap.style.right = "14px";
-        wrap.style.bottom = "14px";
+        wrap.style.right  = cfg.offsetRight + "px";
+        wrap.style.bottom = cfg.offsetBottom + "px";
         panel.style.width = "";
         panel.style.height = "";
         wrap.classList.remove("is-open");
@@ -506,8 +513,8 @@
         localStorage.removeItem(LS_POS);
         localStorage.removeItem(LS_SIZE);
         localStorage.removeItem(LS_OPEN);
-        wrap.style.right = "14px";
-        wrap.style.bottom = "14px";
+        wrap.style.right  = cfg.offsetRight + "px";
+        wrap.style.bottom = cfg.offsetBottom + "px";
         panel.style.width = "";
         panel.style.height = "";
         wrap.classList.remove("is-open");
